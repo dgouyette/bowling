@@ -1,7 +1,7 @@
 import org.scalatest._
-import shapeless.{HList, HNil}
-import shapeless._, nat._, shapeless.ops.hlist.{LeftReducer, Length}, ops.nat.{Mod, Prod, Sum}
-
+import shapeless._
+import syntax.std.tuple._
+/**
 object BowlingScoreShapeless {
 
   type Manche = Int :: Int :: HNil
@@ -9,24 +9,30 @@ object BowlingScoreShapeless {
   type DerniereManche = Int :: Int :: Int :: HNil
   type Game = Manche :: HNil
 
+
+
   def score(game: Game) = {
-    import XXXXXXX._
-    val a = game.
+    import Add._
+    game.head.reduceLeft(Add)
   }
 
-  object Sum extends LeftReducer[Game, Int] {
-    override type Out = Int
 
-    override def apply(t: Game): Int =2
+  object Add extends Poly2 {
+    implicit def caseInt = at[Int, Int](_ + _)
+
+    implicit def caseManche = at[Int, Manche](_ + _.reduceLeft(Add))
   }
+
+ object MancheScore extends Poly1 {
+
+    import Add._
+
+    implicit def caseManche = at[Manche](_.reduceLeft(Add))
+
+    implicit def caseDerniereManche = at[DerniereManche](_.reduceLeft(Add))
+  }
+
 }
-  object XXXXXXX extends Poly1 {
-    implicit def caseInt = at[Int](x => x)
-
-  //val game: Game = (0 :: 0 :: HNil) :: (0 :: 0 :: 0 :: HNil) :: HNil
-
-}
-
 
 class BowlingScoreShapelessSpec extends FlatSpec with ShouldMatchers {
 
@@ -35,10 +41,10 @@ class BowlingScoreShapelessSpec extends FlatSpec with ShouldMatchers {
 
 
   "Une manche 0 + 0" should " doit avoir un score de 0" in {
-    score((0::0::HNil)::HNil) shouldEqual 0
+    score((0 :: 0 :: HNil) :: HNil) shouldEqual 0
   }
 
   "Une manche 3 + 1" should " doit avoir un score de 4" in {
-    score((3::1::HNil)::HNil) shouldEqual 4
+    score((3 :: 1 :: HNil) :: HNil) shouldEqual 4
   }
-}
+}**/
