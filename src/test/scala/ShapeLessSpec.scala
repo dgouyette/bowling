@@ -4,9 +4,8 @@ import shapeless._
 
 object Bowling {
 
-
-
 type Manche = Int :: Int :: HNil
+
 type DerniereManche = Int :: Int :: Int ::  HNil
 
 type JeuUneManche = Manche :: HNil
@@ -15,6 +14,7 @@ type JeuTroisManches = Manche :: Manche :: Manche ::  HNil
 type JeuMancheMixtes = Manche :: Manche :: DerniereManche :: HNil
 type JeuOriginal =  Manche :: Manche :: Manche :: Manche  :: Manche :: Manche  ::Manche :: Manche :: Manche :: DerniereManche :: HNil
 
+  trait Jeu[L <: HList]
 
   object Score extends Poly1 {
   implicit def caseManche  = at[Manche](manche => manche.head + manche.tail.reduceLeft(Add))
@@ -24,20 +24,22 @@ type JeuOriginal =  Manche :: Manche :: Manche :: Manche  :: Manche :: Manche  :
   implicit def caseJeu3 = at[JeuTroisManches](jeu3ManchesScore)
 
 
-  def jeux2Manches2Score: (JeuDeuxManches) => Int = {
+  def jeux2Manches2Score: (Manche :: Manche :: HNil) => Int = {
     case (h1 :: h2 :: HNil) :: (t1 :: t2 :: HNil) :: _ if h1 == 10 => h1 + t1 + t1 + t2 + t2
     case (h1 :: h2 :: HNil) :: (t1 :: t2 :: HNil) :: _ if h1 + h2 == 10 => h1 + h2 + t1 + t1 + t2
     case jeu => Score(jeu.head) + jeu.tail.map(Score).reduceLeft(Add)
   }
 
 
-  def jeu3ManchesScore : (JeuTroisManches) => Int  = {
+
+    def jeu3ManchesScore : (Manche :: Manche :: Manche :: HNil ) => Int  = {
     case (h1 :: h2 :: HNil) :: (t1 :: t2 :: HNil) :: tail if h1 == 10 => h1 + t1 + t1 + t2 + t2 + Score(tail)
     case (h1 :: h2 :: HNil) :: (t1 :: t2 :: HNil) :: tail if h1 + h2 == 10 & t1 + t2 == 10 => h1 + h2 + t1 + t1 + t2 + tail.head.head +  Score(tail)
     case (h1 :: h2 :: HNil) :: (t1 :: t2 :: HNil) :: tail if h1 + h2 == 10 => h1 + h2 + t1 + t1 + t2 + Score(tail)
     case jeu => Score(jeu.head) + Score(jeu.tail)
   }
 }
+
 
 
 
